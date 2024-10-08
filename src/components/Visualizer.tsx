@@ -1,9 +1,10 @@
 import {vec2, mat2d} from 'gl-matrix'
 import { useLayoutEffect, useMemo, useState } from 'react'
+import { Transform, transformToMatrix } from '../transform'
 
 interface VisualizerProps {
   shape: vec2[]
-  transforms: mat2d[]
+  transforms: Transform[]
 }
 
 export function Visualizer({shape, transforms}: VisualizerProps) {
@@ -30,7 +31,8 @@ export function Visualizer({shape, transforms}: VisualizerProps) {
     const m = mat2d.create()
     mat2d.copy(m, viewTransform)
     for (const transform of transforms) {
-      mat2d.multiply(m, m, transform)
+      const matrix = transformToMatrix(transform)
+      mat2d.multiply(m, m, matrix)
     }
     return m
   }, [transforms, viewTransform])
