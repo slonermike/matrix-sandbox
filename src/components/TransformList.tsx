@@ -52,10 +52,8 @@ export function TransformList({transforms}: TransformListProps) {
     display: 'flex',
     flexDirection: 'row'
   }}>
-    {transforms.map((t, i) => {
-      return <>
-        <TransformListItem key={`${t.type}-${i}`} transform={t} />
-      </>
+    {transforms.map((t) => {
+      return <TransformListItem key={`${t.type}-${t.id}`} transform={t} />
     })}
     <div style={transformStyle}>
       <div style={titleStyle}>Position</div>
