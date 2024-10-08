@@ -4,7 +4,7 @@ import { type vec2, mat2d } from "gl-matrix";
 
 interface RotateTransform {
   type: 'rotate',
-  rotation: number
+  radians: number
 }
 
 interface ScaleTransform {
@@ -26,7 +26,7 @@ export function transformToMatrix(transform: Transform): mat2d {
       mat2d.fromTranslation(m, transform.move)
       break
     case 'rotate':
-      mat2d.fromRotation(m, transform.rotation)
+      mat2d.fromRotation(m, transform.radians)
       break
     case 'scale':
       mat2d.fromScaling(m, transform.scale)

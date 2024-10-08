@@ -1,6 +1,7 @@
 import { type vec2 } from "gl-matrix"
 import { Visualizer } from "./components/Visualizer"
 import { Transform, transformToMatrix } from "./transform";
+import { TransformList } from "./components/TransformList";
 
 const SQUARE: vec2[] = [[100, 100], [-100, 100], [-100, -100], [100, -100]]
 const App = () => {
@@ -10,7 +11,7 @@ const App = () => {
   }
   const rotate: Transform = {
     type: 'rotate',
-    rotation: Math.random() * Math.PI * 2
+    radians: Math.random() * Math.PI * 0.5
   }
   const scale: Transform = {
     type: 'scale',
@@ -22,6 +23,7 @@ const App = () => {
   return (
     <div>
       <Visualizer shape={SQUARE} transforms={transforms.map(x => transformToMatrix(x))} />
+      <TransformList transforms={transforms} />
     </div>
   )
 };
