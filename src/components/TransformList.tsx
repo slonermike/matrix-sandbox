@@ -59,7 +59,7 @@ export function TransformList({transforms, updateTransforms, setHoveredId}: Tran
     flexDirection: 'row'
   }} values={transforms} onReorder={updateTransforms}>
     {transforms.map((t) => {
-      return <Reorder.Item as="div" key={t.id} value={t}>
+      return <Reorder.Item as="div" key={t.id} value={t} onDrag={() => setHoveredId(null)}>
         <div style={transformStyle}
           onMouseOver={() => {
             setHoveredId(t.id)}
