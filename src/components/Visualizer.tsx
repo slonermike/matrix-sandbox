@@ -5,9 +5,16 @@ import { Transform, transformToMatrix } from '../transform'
 interface VisualizerProps {
   shape: vec2[]
   transforms: Transform[]
+  hoveredId: number | null
 }
 
-export function Visualizer({shape, transforms}: VisualizerProps) {
+interface TransformStep {
+  matrix: mat2d,
+  type: string,
+  id: number
+}
+
+export function Visualizer({shape, transforms, hoveredId}: VisualizerProps) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
 
@@ -27,23 +34,38 @@ export function Visualizer({shape, transforms}: VisualizerProps) {
     return mView
   }, [windowWidth, windowHeight])
 
-  const finalTransform = useMemo(() => {
-    const m = mat2d.create()
-    mat2d.copy(m, viewTransform)
+  const transformSteps: TransformStep[] = useMemo(() => {
+    const steps: TransformStep[] = [{
+      matrix: viewTransform,
+      type: 'origin',
+      id: -1
+    }]
+
     for (const transform of transforms) {
-      const matrix = transformToMatrix(transform)
-      mat2d.multiply(m, m, matrix)
+      const tMatrix = transformToMatrix(transform)
+      const m = mat2d.create()
+      mat2d.multiply(m, steps[steps.length-1].matrix, tMatrix)
+      steps.push({
+        matrix: m,
+        type: transform.type,
+        id: transform.id
+      })
     }
-    return m
+
+    return steps
   }, [transforms, viewTransform])
 
-  const transformedShape = useMemo(() => {
-    return shape.map(vec => {
-      const newVec = vec2.create()
-      vec2.transformMat2d(newVec, vec, finalTransform)
-      return newVec
+  const transformedShapes = useMemo(() => {
+    return transformSteps.map(step => {
+      return shape.map(vec => {
+        const newVec = vec2.create()
+        vec2.transformMat2d(newVec, vec, step.matrix)
+        return newVec
+      })
     })
-  }, [finalTransform, shape])
+  }, [transformSteps, shape])
+
+  const focusId = hoveredId !== null ? hoveredId : transforms[transforms.length-1].id
 
   return (
     <div
@@ -65,13 +87,15 @@ export function Visualizer({shape, transforms}: VisualizerProps) {
           scale: '1 -1'
         }}
       >
-
-        <polygon
+        {transformedShapes.map((transformedShape, i) => {
+          const focused = focusId === transformSteps[i].id
+          return <polygon key={transforms[i-1]?.id ?? 'root'}
           points={transformedShape.flat().join(', ')}
-          stroke={'rgba(0,128,128,1)'}
+          stroke={focused ? 'rgba(0,128,128,0.5)' : 'rgba(128,128,128,0.1)'}
           strokeWidth={6}
-          fill={'rgba(0,128,128,0.5)'}
+          fill={focused ? 'rgba(0,128,128,0.25)' : 'rgba(128,128,128,0.05)'}
         />
+        })}
       </svg>
     </div>
     )

@@ -6,6 +6,7 @@ import { move, rotate, scale, Transform } from "../transform";
 interface TransformListProps {
   transforms: Transform[]
   updateTransforms: (transforms: Transform[]) => void
+  setHoveredId: (id: number | null) => void
 }
 
 const titleStyle: CSSProperties = {
@@ -40,13 +41,13 @@ function transformValueString(transform: Transform) {
   }
 }
 
-export function TransformList({transforms: items, updateTransforms}: TransformListProps) {
+export function TransformList({transforms, updateTransforms, setHoveredId}: TransformListProps) {
 
   useEffect(() => {
     updateTransforms([
-      move([Math.random() * 250, Math.random() * 500]),
-      rotate(Math.random() * Math.PI * 2),
-      scale([1 + Math.random(), 1 + Math.random()])
+      move([200, 200]),
+      rotate(Math.PI * 0.1),
+      scale([1, 2])
     ])
   }, [updateTransforms])
 
@@ -56,10 +57,17 @@ export function TransformList({transforms: items, updateTransforms}: TransformLi
     left: 0,
     display: 'flex',
     flexDirection: 'row'
-  }} values={items} onReorder={updateTransforms}>
-    {items.map((t) => {
+  }} values={transforms} onReorder={updateTransforms}>
+    {transforms.map((t) => {
       return <Reorder.Item as="div" key={t.id} value={t}>
-        <div style={transformStyle}>
+        <div style={transformStyle}
+          onMouseOver={() => {
+            setHoveredId(t.id)}
+          }
+          onMouseOut={() => {
+            setHoveredId(null)
+          }}
+        >
           <div style={titleStyle}>{t.type}</div>
           <div>{transformValueString(t)}</div>
         </div>

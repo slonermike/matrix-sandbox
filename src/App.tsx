@@ -8,11 +8,12 @@ const SQUARE: vec2[] = [[100, 100], [-100, 100], [-100, -100], [100, -100]]
 
 const App = () => {
   const [transforms, setTransforms] = useState<Transform[]>([])
+  const [hoveredId, setHoveredId] = useState<number | null>(null)
 
   return (
     <div>
-      <Visualizer shape={SQUARE} transforms={transforms} />
-      <TransformList updateTransforms={setTransforms} transforms={transforms} />
+      <Visualizer shape={SQUARE} transforms={transforms} hoveredId={hoveredId} />
+      <TransformList updateTransforms={setTransforms} transforms={transforms} setHoveredId={setHoveredId} />
     </div>
   )
 };
