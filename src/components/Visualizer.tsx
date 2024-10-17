@@ -65,7 +65,7 @@ export function Visualizer({shape, transforms, hoveredId}: VisualizerProps) {
     })
   }, [transformSteps, shape])
 
-  const focusId = hoveredId !== null ? hoveredId : transforms[transforms.length-1].id
+  const focusId = hoveredId !== null ? hoveredId : transforms[transforms.length-1]?.id
 
   return (
     <div
