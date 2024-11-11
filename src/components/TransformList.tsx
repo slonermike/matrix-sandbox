@@ -43,6 +43,7 @@ function transformValueString(transform: Transform) {
 
 export function TransformList({transforms, updateTransforms, setHoveredId}: TransformListProps) {
 
+  // Default transforms.
   useEffect(() => {
     updateTransforms([
       move([200, 200]),
@@ -60,18 +61,28 @@ export function TransformList({transforms, updateTransforms, setHoveredId}: Tran
   }} values={transforms} onReorder={updateTransforms}>
     {transforms.map((t) => {
       return <Reorder.Item as="div" key={t.id} value={t} onDrag={() => setHoveredId(null)}>
-        <div style={transformStyle}
-          onMouseOver={() => {
-            setHoveredId(t.id)}
-          }
-          onMouseOut={() => {
-            setHoveredId(null)
-          }}
-        >
-          <div style={titleStyle}>{t.type}</div>
-          <div>{transformValueString(t)}</div>
-        </div>
+        <TransformItem
+          t={t}
+          onMouseOver={() => setHoveredId(t.id)}
+          onMouseOut={() => setHoveredId(null)}
+        />
     </Reorder.Item>
     })}
   </Reorder.Group>
+}
+
+interface ItemProps {
+  onMouseOver: () => void
+  onMouseOut: () => void,
+  t: Transform
+}
+
+function TransformItem({t, onMouseOver, onMouseOut}: ItemProps) {
+  return <div style={transformStyle}
+    onMouseOver={onMouseOver}
+    onMouseOut={onMouseOut}
+    >
+    <div style={titleStyle}>{t.type}</div>
+    <div>{transformValueString(t)}</div>
+  </div>
 }
