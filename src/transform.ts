@@ -5,6 +5,7 @@ import { type vec2, mat2d } from "gl-matrix";
 interface RotateTransform {
   id: number,
   active: boolean,
+  invert?: boolean,
   type: 'rotate',
   radians: number
 }
@@ -12,6 +13,7 @@ interface RotateTransform {
 interface ScaleTransform {
   id: number,
   active: boolean,
+  invert?: boolean,
   type: 'scale',
   scale: vec2
 }
@@ -19,6 +21,7 @@ interface ScaleTransform {
 interface MoveTransform {
   id: number,
   active: boolean,
+  invert?: boolean,
   type: 'move',
   move: vec2
 }
@@ -45,6 +48,11 @@ export function transformToMatrix(transform: Transform): mat2d {
     default:
       break
   }
+
+  if (transform.invert) {
+    mat2d.invert(m, m)
+  }
+
   return  m
 }
 

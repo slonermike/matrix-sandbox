@@ -17,7 +17,7 @@ const titleStyle: CSSProperties = {
 const transformStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   border: '2px black solid',
   borderRadius: '6px',
   margin: '8px',
@@ -178,10 +178,17 @@ function TransformItem({t, onMouseOver, onMouseOut, replaceTransform}: ItemProps
     }
   }, [replaceTransform, inputValues, t, moveValue, updateStrings])
 
-  const onCheck = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  const onCheckActive = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     replaceTransform({
       ...t,
       active: e.target.checked
+    })
+  }, [replaceTransform, t])
+
+  const onCheckInvert = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    replaceTransform({
+      ...t,
+      invert: e.target.checked
     })
   }, [replaceTransform, t])
 
@@ -189,12 +196,13 @@ function TransformItem({t, onMouseOver, onMouseOut, replaceTransform}: ItemProps
     onMouseOver={onMouseOver}
     onMouseOut={onMouseOut}
     >
-    <div style={titleStyle}><input type={'checkbox'} checked={t.active} onChange={onCheck}/>{t.type}</div>
+    <div style={titleStyle}><input type={'checkbox'} checked={t.active} onChange={onCheckActive}/>{t.type}</div>
     {inputValues.map((s, index) => <input
       key={index}
       value={s}
       onChange={e => onEdit(e, index)}
       onKeyDown={e => onKeyDown(e, index)}
     ></input>)}
+    <div><input type={'checkbox'} checked={!!t.invert} onChange={onCheckInvert}/>Invert</div>
   </div>
 }
