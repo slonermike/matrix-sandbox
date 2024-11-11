@@ -5,7 +5,7 @@ import { Transform } from "./transform";
 import { useState } from "react";
 
 //const SQUARE: vec2[] = [[100, 100], [-100, 100], [-100, -100], [100, -100]]
-const ARROW: vec2[] = [[-25, -25], [25, -25], [25, 150], [50, 150], [0, 250], [-50, 150], [-25, 150]]
+const ARROW: vec2[] = [[-25, 0], [25, 0], [25, 150], [50, 150], [0, 250], [-50, 150], [-25, 150]]
 
 const App = () => {
   const [transforms, setTransforms] = useState<Transform[]>([])

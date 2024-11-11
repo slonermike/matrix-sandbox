@@ -1,6 +1,6 @@
 import { Reorder } from 'framer-motion'
 import { vec2 } from 'gl-matrix'
-import { KeyboardEvent, ChangeEvent, CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
+import { KeyboardEvent, ChangeEvent, CSSProperties, useCallback, useEffect, useState } from "react";
 import { move, rotate, scale, Transform } from "../transform";
 
 interface TransformListProps {
@@ -68,13 +68,14 @@ export function TransformList({transforms, updateTransforms, setHoveredId}: Tran
           onMouseOver={() => setHoveredId(t.id)}
           onMouseOut={() => setHoveredId(null)}
           replaceTransform={t => {
-            updateTransforms(transforms.map(oldT => {
+            const newTransforms = transforms.map(oldT => {
               if (oldT.id === t.id) {
                 return t
               } else {
                 return oldT
               }
-            }))
+            })
+            updateTransforms(newTransforms)
           }}
         />
     </Reorder.Item>
@@ -95,8 +96,11 @@ function myParseFloat(str: string) {
 }
 
 function TransformItem({t, onMouseOver, onMouseOut, replaceTransform}: ItemProps) {
-  const strings = useMemo(() => transformValueStrings(t), [t])
-  const [inputValues, setInputValues] = useState<string[]>(strings)
+  const [inputValues, setInputValues] = useState<string[]>(transformValueStrings(t))
+
+  const updateStrings = useCallback((t: Transform) => {
+    setInputValues(transformValueStrings(t))
+  }, [])
 
   const onEdit = useCallback((e: ChangeEvent<HTMLInputElement>, index: number) => {
     setInputValues(strings => {
@@ -106,7 +110,39 @@ function TransformItem({t, onMouseOver, onMouseOut, replaceTransform}: ItemProps
     })
   }, [setInputValues])
 
-  const onKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+  const moveValue = useCallback((t: Transform, key: string, mod: boolean, index: number) => {
+    const change: vec2 = [0, 0]
+    change[index] += key === 'ArrowUp' ? 1 : 0
+    change[index] -= key === 'ArrowDown' ? 1 : 0
+    change[index] *= mod ? 1 : 5
+
+    const newT = {...t}
+    switch(newT.type) {
+      case 'move':
+        if (newT.type === 'move') {
+          newT.move = [newT.move[0] + change[0], newT.move[1] + change[1]]
+        }
+      break
+      case 'scale':
+        if (newT.type === 'scale') {
+          newT.scale = [newT.scale[0] + change[0] * 0.1, newT.scale[1] + change[1] * 0.1]
+        }
+      break
+      case 'rotate':
+        if (newT.type === 'rotate') {
+          const degrees = newT.radians * (180 / Math.PI) + change[0] + change[1]
+          newT.radians = degrees / (180 / Math.PI)
+        }
+        break
+      default:
+        break
+    }
+
+    replaceTransform(newT)
+    updateStrings(newT)
+  }, [replaceTransform, updateStrings])
+
+  const onKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === 'Enter') {
       let newTransform: Transform
       switch (t.type) {
@@ -136,8 +172,11 @@ function TransformItem({t, onMouseOver, onMouseOut, replaceTransform}: ItemProps
           break
       }
       replaceTransform(newTransform)
+      updateStrings(newTransform)
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      moveValue(t, e.key, e.shiftKey, index)
     }
-  }, [replaceTransform, inputValues, t])
+  }, [replaceTransform, inputValues, t, moveValue, updateStrings])
 
   const onCheck = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     replaceTransform({
@@ -155,7 +194,7 @@ function TransformItem({t, onMouseOver, onMouseOut, replaceTransform}: ItemProps
       key={index}
       value={s}
       onChange={e => onEdit(e, index)}
-      onKeyDown={onKeyDown}
+      onKeyDown={e => onKeyDown(e, index)}
     ></input>)}
   </div>
 }
