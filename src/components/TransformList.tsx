@@ -139,11 +139,18 @@ function TransformItem({t, onMouseOver, onMouseOut, replaceTransform}: ItemProps
     }
   }, [replaceTransform, inputValues, t])
 
+  const onCheck = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    replaceTransform({
+      ...t,
+      active: e.target.checked
+    })
+  }, [replaceTransform, t])
+
   return <div style={transformStyle}
     onMouseOver={onMouseOver}
     onMouseOut={onMouseOut}
     >
-    <div style={titleStyle}>{t.type}</div>
+    <div style={titleStyle}><input type={'checkbox'} checked={t.active} onChange={onCheck}/>{t.type}</div>
     {inputValues.map((s, index) => <input
       key={index}
       value={s}
