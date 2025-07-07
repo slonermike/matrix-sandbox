@@ -1,13 +1,8 @@
 import { Reorder } from 'framer-motion'
 import { vec2 } from 'gl-matrix'
-import { KeyboardEvent, ChangeEvent, CSSProperties, useCallback, useEffect, useState } from "react";
-import { move, rotate, scale, Transform } from "../transform";
-
-interface TransformListProps {
-  transforms: Transform[]
-  updateTransforms: (transforms: Transform[]) => void
-  setHoveredId: (id: number | null) => void
-}
+import { KeyboardEvent, ChangeEvent, CSSProperties, useCallback, useState, useContext, useMemo } from "react";
+import { Transform } from "../transform";
+import { SandboxContext } from './SandboxContext';
 
 const titleStyle: CSSProperties = {
   fontWeight: 'bold',
@@ -21,7 +16,10 @@ const transformStyle: CSSProperties = {
   border: '2px black solid',
   borderRadius: '6px',
   margin: '8px',
-  padding: '8px'
+  padding: '8px',
+  backgroundColor: `rgb(0, 128, 128)`,
+  gap: '8px',
+  cursor: 'grab'
 }
 
 function vec2strings(v: vec2, numDigits: number = 0): string[] {
@@ -43,16 +41,10 @@ function transformValueStrings(transform: Transform): string[] {
   return []
 }
 
-export function TransformList({transforms, updateTransforms, setHoveredId}: TransformListProps) {
+export function TransformList() {
 
-  // Default transforms.
-  useEffect(() => {
-    updateTransforms([
-      move([200, 200]),
-      rotate(Math.PI * 0.1),
-      scale([1, 2])
-    ])
-  }, [updateTransforms])
+  const {setTransforms, transforms, setHoveredId} = useContext(SandboxContext)
+  const [isDragging, setIsDragging] = useState(false)
 
   return <Reorder.Group axis="x" as="div" style={{
     position: 'absolute',
@@ -60,11 +52,12 @@ export function TransformList({transforms, updateTransforms, setHoveredId}: Tran
     left: 0,
     display: 'flex',
     flexDirection: 'row'
-  }} values={transforms} onReorder={updateTransforms}>
+  }} values={transforms} onReorder={setTransforms}>
     {transforms.map((t) => {
-      return <Reorder.Item as="div" key={t.id} value={t} onDrag={() => setHoveredId(null)}>
+      return <Reorder.Item as="div" key={t.id} value={t} onDrag={() => setHoveredId(null)} onDragStart={() => setIsDragging(true)} onDragEnd={() => setIsDragging(false)}>
         <TransformItem
           t={t}
+          isDragging={isDragging}
           onMouseOver={() => setHoveredId(t.id)}
           onMouseOut={() => setHoveredId(null)}
           replaceTransform={t => {
@@ -75,7 +68,7 @@ export function TransformList({transforms, updateTransforms, setHoveredId}: Tran
                 return oldT
               }
             })
-            updateTransforms(newTransforms)
+            setTransforms(newTransforms)
           }}
         />
     </Reorder.Item>
@@ -87,7 +80,8 @@ interface ItemProps {
   onMouseOver: () => void
   onMouseOut: () => void,
   t: Transform,
-  replaceTransform: (t: Transform) => void
+  replaceTransform: (t: Transform) => void,
+  isDragging: boolean
 }
 
 function myParseFloat(str: string) {
@@ -95,7 +89,7 @@ function myParseFloat(str: string) {
   return isNaN(f) ? 0 : f
 }
 
-function TransformItem({t, onMouseOver, onMouseOut, replaceTransform}: ItemProps) {
+function TransformItem({t, isDragging, onMouseOver, onMouseOut, replaceTransform}: ItemProps) {
   const [inputValues, setInputValues] = useState<string[]>(transformValueStrings(t))
 
   const updateStrings = useCallback((t: Transform) => {
@@ -109,6 +103,17 @@ function TransformItem({t, onMouseOver, onMouseOut, replaceTransform}: ItemProps
       return newStrings
     })
   }, [setInputValues])
+
+  const styles = useMemo(() => {
+    if (isDragging) {
+      return {
+        ...transformStyle,
+        cursor: 'grabbing'
+      }
+    } else {
+      return transformStyle
+    }
+  }, [isDragging])
 
   const moveValue = useCallback((t: Transform, key: string, mod: boolean, index: number) => {
     const change: vec2 = [0, 0]
@@ -192,7 +197,7 @@ function TransformItem({t, onMouseOver, onMouseOut, replaceTransform}: ItemProps
     })
   }, [replaceTransform, t])
 
-  return <div style={transformStyle}
+  return <div style={styles}
     onMouseOver={onMouseOver}
     onMouseOut={onMouseOut}
     >
