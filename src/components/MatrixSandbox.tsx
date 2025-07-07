@@ -12,7 +12,7 @@ export function MatrixSandbox() {
   const [transforms, setTransforms] = useState<Transform[]>([])
   const [hoveredId, setHoveredId] = useState<number | null>(null)
   return <div>
-    <Visualizer shape={ARROW} transforms={transforms} hoveredId={hoveredId} />
-    <TransformList updateTransforms={setTransforms} transforms={transforms} setHoveredId={setHoveredId} />
+      <Visualizer shape={ARROW} transforms={transforms} hoveredId={hoveredId} />
+      <TransformList updateTransforms={setTransforms} transforms={transforms} setHoveredId={setHoveredId} />
   </div>
 }
