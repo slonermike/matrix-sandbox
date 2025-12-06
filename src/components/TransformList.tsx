@@ -6,7 +6,7 @@ import { type CSSProperties } from 'react';
 
 const dragHandleStyle: CSSProperties = {
   cursor: 'grab',
-  padding: '4px',
+  padding: '4px 10px',
   userSelect: 'none',
   position: 'absolute',
   top: '8px',

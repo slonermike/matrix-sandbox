@@ -35,9 +35,10 @@ export function RotationInput({ value, onChange, size = 150 }: RotationInputProp
     const centerX = size / 2
     const centerY = size / 2
     const radius = (size / 2) * 0.7 // 70% of radius for the handle
+    // Negate radians to make counter-clockwise positive (matching the main view)
     return [
-      centerX + Math.cos(radians - Math.PI / 2) * radius,
-      centerY + Math.sin(radians - Math.PI / 2) * radius
+      centerX + Math.cos(-radians - Math.PI / 2) * radius,
+      centerY + Math.sin(-radians - Math.PI / 2) * radius
     ]
   }, [size])
 
@@ -46,7 +47,8 @@ export function RotationInput({ value, onChange, size = 150 }: RotationInputProp
     const centerY = size / 2
     const dx = canvasX - centerX
     const dy = canvasY - centerY
-    return Math.atan2(dy, dx) + Math.PI / 2
+    // Negate to make counter-clockwise positive (matching the main view)
+    return -(Math.atan2(dy, dx) + Math.PI / 2)
   }, [size])
 
   const drawCanvas = useCallback(() => {

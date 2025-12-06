@@ -4,17 +4,20 @@ import { move, rotate, scale, type Transform } from '../transform'
 interface SandboxStore {
     transforms: Transform[]
     hoveredId: number | null
+    infoOpen: boolean
 
     setTransforms: (transforms: Transform[]) => void
     replaceTransform: (transform: Transform) => void
     setHoveredId: (id: number | null) => void
+    setInfoOpen: (open: boolean) => void
 }
 
 export const useSandboxStore = create<SandboxStore>((set) => ({
-    transforms: [move([200, 200]),
+    transforms: [move([50, 50]),
     rotate(Math.PI * 0.1),
-    scale([1, 2])],
+    scale([1, 1.5])],
     hoveredId: null,
+    infoOpen: true,
 
     setTransforms: (transforms) => {
         set({transforms})
@@ -35,5 +38,8 @@ export const useSandboxStore = create<SandboxStore>((set) => ({
         set({
             hoveredId
         })
+    },
+    setInfoOpen: (infoOpen) => {
+        set({ infoOpen })
     }
 }))

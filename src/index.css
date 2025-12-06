@@ -33,21 +33,22 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .info-verbose-container {
-  position: relative;
-  z-index: -1;
+  position: absolute;
+  bottom: 80px;
+  right: 0px;
+  overflow: hidden;
 }
 
 .info-verbose {
-  position: absolute;
   width: min(30vh, 400px);
-  right: 0;
-  bottom: 0;
   border: 1.5px solid black;
   border-radius: 8px;
-  padding: 8px;
+  padding: 0 18px 8px;
+  background-color: white;
 }
 
 .hover-link {
