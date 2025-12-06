@@ -1,13 +1,48 @@
-import { Reorder } from 'framer-motion'
-import { useState } from "react";
+import { Reorder, useDragControls } from 'framer-motion'
 import { useSandboxStore } from '../store/sandboxStore';
 import { TransformItem } from './TransformItem';
+import { type Transform } from '../transform';
+import { type CSSProperties } from 'react';
+
+const dragHandleStyle: CSSProperties = {
+  cursor: 'grab',
+  padding: '4px',
+  userSelect: 'none',
+  position: 'absolute',
+  top: '8px',
+  left: '8px'
+}
+
+function ReorderableTransformItem({ t }: { t: Transform }) {
+  const dragControls = useDragControls()
+  const setHoveredId = useSandboxStore(state => state.setHoveredId)
+
+  return (
+    <Reorder.Item
+      as="div"
+      key={t.id}
+      value={t}
+      dragListener={false}
+      dragControls={dragControls}
+      onDrag={() => setHoveredId(null)}
+      onDragStart={() => {}}
+      onDragEnd={() => {}}
+      style={{ position: 'relative' }}
+    >
+      <span
+        style={dragHandleStyle}
+        onPointerDown={(e) => dragControls.start(e)}
+      >
+        ⋮⋮
+      </span>
+      <TransformItem t={t} />
+    </Reorder.Item>
+  )
+}
 
 export function TransformList() {
   const transforms = useSandboxStore(state => state.transforms)
   const setTransforms = useSandboxStore(state => state.setTransforms)
-  const setHoveredId = useSandboxStore(state => state.setHoveredId)
-  const [isDragging, setIsDragging] = useState(false)
 
   return <Reorder.Group axis="x" as="div" style={{
     position: 'absolute',
@@ -16,14 +51,9 @@ export function TransformList() {
     display: 'flex',
     flexDirection: 'row'
   }} values={transforms} onReorder={setTransforms}>
-    {transforms.map((t) => {
-      return <Reorder.Item as="div" key={t.id} value={t} onDrag={() => setHoveredId(null)} onDragStart={() => setIsDragging(true)} onDragEnd={() => setIsDragging(false)}>
-        <TransformItem
-          t={t}
-          isDragging={isDragging}
-        />
-    </Reorder.Item>
-    })}
+    {transforms.map((t) => (
+      <ReorderableTransformItem key={t.id} t={t} />
+    ))}
   </Reorder.Group>
 }
 

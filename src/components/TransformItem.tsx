@@ -3,10 +3,16 @@ import { type Transform } from "../transform"
 import { transformValueStrings } from "../util/inputUtils"
 import { useSandboxStore } from "../store/sandboxStore"
 import { type vec2 } from "gl-matrix"
+import { Vec2Input } from "./Vec2Input"
 
 const titleStyle: CSSProperties = {
   fontWeight: 'bold',
-  textTransform: 'capitalize'
+  textTransform: 'capitalize',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: '8px',
+  width: '100%'
 }
 
 const transformStyle: CSSProperties = {
@@ -18,13 +24,11 @@ const transformStyle: CSSProperties = {
   margin: '8px',
   padding: '8px',
   backgroundColor: `rgb(0, 128, 128)`,
-  gap: '8px',
-  cursor: 'grab'
+  gap: '8px'
 }
 
 interface ItemProps {
-  t: Transform,
-  isDragging: boolean
+  t: Transform
 }
 
 function myParseFloat(str: string) {
@@ -32,7 +36,7 @@ function myParseFloat(str: string) {
   return isNaN(f) ? 0 : f
 }
 
-export function TransformItem({t, isDragging}: ItemProps) {
+export function TransformItem({t}: ItemProps) {
   const [inputValues, setInputValues] = useState<string[]>(transformValueStrings(t))
   const replaceTransform = useSandboxStore(state => state.replaceTransform)
   const setHoveredId = useSandboxStore(state => state.setHoveredId)
@@ -50,15 +54,8 @@ export function TransformItem({t, isDragging}: ItemProps) {
   }, [setInputValues])
 
   const styles = useMemo(() => {
-    if (isDragging) {
-      return {
-        ...transformStyle,
-        cursor: 'grabbing'
-      }
-    } else {
-      return transformStyle
-    }
-  }, [isDragging])
+    return transformStyle
+  }, [])
 
   const moveValue = useCallback((t: Transform, key: string, mod: boolean, index: number) => {
     const change: vec2 = [0, 0]
@@ -145,12 +142,40 @@ export function TransformItem({t, isDragging}: ItemProps) {
   const onMouseOver = useCallback(() => setHoveredId(t.id), [t.id, setHoveredId])
   const onMouseOut = useCallback(() => setHoveredId(null), [setHoveredId])
 
+  const onVec2Change = useCallback((newValue: vec2) => {
+    let newTransform: Transform
+    switch (t.type) {
+      case 'move':
+        newTransform = {
+          ...t,
+          move: newValue
+        }
+        break
+      case 'scale':
+        newTransform = {
+          ...t,
+          scale: newValue
+        }
+        break
+      default:
+        return
+    }
+    replaceTransform(newTransform)
+    updateStrings(newTransform)
+  }, [t, replaceTransform, updateStrings])
+
   return <div style={styles}
     onMouseOver={onMouseOver}
     onMouseOut={onMouseOut}
     >
-    <div style={titleStyle}><input type={'checkbox'} checked={t.active} onChange={onCheckActive}/>{t.type}</div>
-    {inputValues.map((s, index) => <input
+    <div style={titleStyle}>{t.type}<input type={'checkbox'} checked={t.active} onChange={onCheckActive}/></div>
+    {t.type === 'move' && (
+      <Vec2Input value={t.move} scale={200} onChange={onVec2Change} />
+    )}
+    {t.type === 'scale' && (
+      <Vec2Input value={t.scale} scale={2} onChange={onVec2Change} />
+    )}
+    {t.type === 'rotate' && inputValues.map((s, index) => <input
       key={index}
       value={s}
       onChange={e => onEdit(e, index)}
