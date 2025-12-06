@@ -1,6 +1,5 @@
-import { type ChangeEvent, type KeyboardEvent, useCallback, useState } from "react"
+import { type ChangeEvent, useCallback } from "react"
 import { type Transform } from "../transform"
-import { transformValueStrings } from "../util/inputUtils"
 import { useSandboxStore } from "../store/sandboxStore"
 import { type vec2 } from "gl-matrix"
 import { Vec2Input } from "./Vec2Input"
@@ -11,96 +10,9 @@ interface ItemProps {
   t: Transform
 }
 
-function myParseFloat(str: string) {
-  const f = parseFloat(str)
-  return isNaN(f) ? 0 : f
-}
-
 export function TransformItem({t}: ItemProps) {
-  const [inputValues, setInputValues] = useState<string[]>(transformValueStrings(t))
   const replaceTransform = useSandboxStore(state => state.replaceTransform)
   const setHoveredId = useSandboxStore(state => state.setHoveredId)
-
-  const updateStrings = useCallback((t: Transform) => {
-    setInputValues(transformValueStrings(t))
-  }, [])
-
-  const onEdit = useCallback((e: ChangeEvent<HTMLInputElement>, index: number) => {
-    setInputValues(strings => {
-      const newStrings = [...strings]
-      newStrings[index] = e.target.value
-      return newStrings
-    })
-  }, [setInputValues])
-
-  const moveValue = useCallback((t: Transform, key: string, mod: boolean, index: number) => {
-    const change: vec2 = [0, 0]
-    change[index] += key === 'ArrowUp' ? 1 : 0
-    change[index] -= key === 'ArrowDown' ? 1 : 0
-    change[index] *= mod ? 1 : 5
-
-    const newT = {...t}
-    switch(newT.type) {
-      case 'move':
-        if (newT.type === 'move') {
-          newT.move = [newT.move[0] + change[0], newT.move[1] + change[1]]
-        }
-      break
-      case 'scale':
-        if (newT.type === 'scale') {
-          newT.scale = [newT.scale[0] + change[0] * 0.1, newT.scale[1] + change[1] * 0.1]
-        }
-      break
-      case 'rotate':
-        if (newT.type === 'rotate') {
-          const degrees = newT.radians * (180 / Math.PI) + change[0] + change[1]
-          newT.radians = degrees / (180 / Math.PI)
-        }
-        break
-      default:
-        break
-    }
-
-    replaceTransform(newT)
-    updateStrings(newT)
-  }, [replaceTransform, updateStrings])
-
-  const onKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (e.key === 'Enter') {
-      let newTransform: Transform
-      switch (t.type) {
-        case 'move':
-          newTransform = {
-            ...t
-          }
-          for (let i = 0; i < inputValues.length; i++) {
-            newTransform.move[i] = myParseFloat(inputValues[i])
-          }
-          break
-        case 'rotate':
-          newTransform = {
-            ...t
-          }
-          for (let i = 0; i < inputValues.length; i++) {
-            newTransform.radians = myParseFloat(inputValues[i]) / (180 / Math.PI)
-          }
-          break
-        case 'scale':
-          newTransform = {
-            ...t
-          }
-          for (let i = 0; i < inputValues.length; i++) {
-            newTransform.scale[i] = myParseFloat(inputValues[i])
-          }
-          break
-      }
-      replaceTransform(newTransform)
-      updateStrings(newTransform)
-    } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-      moveValue(t, e.key, e.shiftKey, index)
-    }
-  }, [replaceTransform, inputValues, t, moveValue, updateStrings])
-
   const onCheckActive = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     replaceTransform({
       ...t,
@@ -137,8 +49,7 @@ export function TransformItem({t}: ItemProps) {
         return
     }
     replaceTransform(newTransform)
-    updateStrings(newTransform)
-  }, [t, replaceTransform, updateStrings])
+  }, [t, replaceTransform])
 
   const onRotationChange = useCallback((newValue: number) => {
     if (t.type !== 'rotate') return
@@ -147,8 +58,7 @@ export function TransformItem({t}: ItemProps) {
       radians: newValue
     }
     replaceTransform(newTransform)
-    updateStrings(newTransform)
-  }, [t, replaceTransform, updateStrings])
+  }, [t, replaceTransform])
 
   return <div className="transform-card"
     onMouseOver={onMouseOver}
