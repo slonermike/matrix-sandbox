@@ -4,6 +4,7 @@ import { transformValueStrings } from "../util/inputUtils"
 import { useSandboxStore } from "../store/sandboxStore"
 import { type vec2 } from "gl-matrix"
 import { Vec2Input } from "./Vec2Input"
+import { RotationInput } from "./RotationInput"
 
 const titleStyle: CSSProperties = {
   fontWeight: 'bold',
@@ -164,6 +165,16 @@ export function TransformItem({t}: ItemProps) {
     updateStrings(newTransform)
   }, [t, replaceTransform, updateStrings])
 
+  const onRotationChange = useCallback((newValue: number) => {
+    if (t.type !== 'rotate') return
+    const newTransform: Transform = {
+      ...t,
+      radians: newValue
+    }
+    replaceTransform(newTransform)
+    updateStrings(newTransform)
+  }, [t, replaceTransform, updateStrings])
+
   return <div style={styles}
     onMouseOver={onMouseOver}
     onMouseOut={onMouseOut}
@@ -175,12 +186,9 @@ export function TransformItem({t}: ItemProps) {
     {t.type === 'scale' && (
       <Vec2Input value={t.scale} scale={2} onChange={onVec2Change} />
     )}
-    {t.type === 'rotate' && inputValues.map((s, index) => <input
-      key={index}
-      value={s}
-      onChange={e => onEdit(e, index)}
-      onKeyDown={e => onKeyDown(e, index)}
-    ></input>)}
+    {t.type === 'rotate' && (
+      <RotationInput value={t.radians} onChange={onRotationChange} />
+    )}
     <div><input type={'checkbox'} checked={!!t.invert} onChange={onCheckInvert}/>Invert</div>
   </div>
 }

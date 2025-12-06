@@ -29,14 +29,19 @@ function InfoVerbose() {
 
 export function InfoOverlay() {
   const [isMousedOver, setIsMousedOver] = useState(false)
+  const [stayOpen, setStayOpen] = useState(false)
   return <div className={'info-overlay'}>
     <div
-      className={'info-circle hover-link'}
+      className={`info-circle hover-link ${stayOpen ? 'stay-open' : ''}`}
       onMouseOver={() => setIsMousedOver(true)}
       onMouseOut={() => setIsMousedOver(false)}
+      onMouseDown={() => {
+        setStayOpen(!stayOpen)
+        setIsMousedOver(false)
+      }}
     >
       <span>i</span>
-      {isMousedOver ? <InfoVerbose /> : null}
+      {(isMousedOver || stayOpen) ? <InfoVerbose /> : null}
     </div>
     <a href="https://github.com/slonermike/matrix-sandbox" target="_blank" rel="noreferrer noopener"><img className="hover-link" src="/github.svg" width="50" height="50" /></a>
     </div>
