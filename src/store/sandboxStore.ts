@@ -1,18 +1,18 @@
 import {create} from 'zustand'
 import { move, rotate, scale, type Transform } from '../transform'
-import { type ShapeName } from '../shapes'
+import { type vec2 } from 'gl-matrix'
 
 interface SandboxStore {
     transforms: Transform[]
     hoveredId: number | null
     infoOpen: boolean
-    shapeName: ShapeName
+    shape: vec2[]
 
     setTransforms: (transforms: Transform[]) => void
     replaceTransform: (transform: Transform) => void
     setHoveredId: (id: number | null) => void
     setInfoOpen: (open: boolean) => void
-    setShapeName: (shapeName: ShapeName) => void
+    setShape: (shape: vec2[]) => void
 }
 
 export const useSandboxStore = create<SandboxStore>((set) => ({
@@ -21,7 +21,7 @@ export const useSandboxStore = create<SandboxStore>((set) => ({
     scale([1, 1.5])],
     hoveredId: null,
     infoOpen: true,
-    shapeName: 'arrow',
+    shape: [[-25, 0], [25, 0], [25, 150], [50, 150], [0, 250], [-50, 150], [-25, 150]],
 
     setTransforms: (transforms) => {
         set({transforms})
@@ -46,7 +46,7 @@ export const useSandboxStore = create<SandboxStore>((set) => ({
     setInfoOpen: (infoOpen) => {
         set({ infoOpen })
     },
-    setShapeName: (shapeName) => {
-        set({ shapeName })
+    setShape: (shape) => {
+        set({ shape })
     }
 }))

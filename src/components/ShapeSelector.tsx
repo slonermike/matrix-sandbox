@@ -1,29 +1,30 @@
 import { useCallback } from "react"
 import { useSandboxStore } from "../store/sandboxStore"
-import { shapes, type ShapeName } from "../shapes"
-import { ShapePreview } from "./ShapePreview"
+import { shapes } from "../shapes"
+import { CustomShapeDrawer } from "./CustomShapeDrawer"
 import "./TransformCard.css"
 
 export function ShapeSelector() {
-  const shapeName = useSandboxStore(state => state.shapeName)
-  const setShapeName = useSandboxStore(state => state.setShapeName)
+  const setShape = useSandboxStore(state => state.setShape)
 
-  const onSelectShape = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setShapeName(e.target.value as ShapeName)
-  }, [setShapeName])
-
-  const currentShape = shapes[shapeName]
+  const onSelectPreset = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const shapeName = e.target.value
+    if (shapeName !== 'custom') {
+      setShape(shapes[shapeName as keyof typeof shapes])
+    }
+  }, [setShape])
 
   return (
     <div className="transform-card">
       <div className="transform-card-title">Shape</div>
-      <ShapePreview shape={currentShape} />
+      <CustomShapeDrawer />
       <select
-        value={shapeName}
-        onChange={onSelectShape}
+        onChange={onSelectPreset}
         className="shape-dropdown"
+        defaultValue=""
       >
-        {Object.keys(shapes).map((name) => (
+        <option value="" disabled>Load preset...</option>
+        {Object.keys(shapes).filter(name => name !== 'custom').map((name) => (
           <option key={name} value={name}>
             {name}
           </option>
