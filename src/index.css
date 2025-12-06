@@ -8,9 +8,52 @@ body {
   color: white;
 }
 
+.info-overlay {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  color: black;
+}
+
+.info-circle span {
+  color: white;
+  font-weight: bolder;
+  font-size: 28px;
+}
+
+.info-circle {
+  background-color: black;
+  border-radius: 50px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.info-verbose-container {
+  position: relative;
+  z-index: -1;
+}
+
+.info-verbose {
+  position: absolute;
+  width: min(30vh, 400px);
+  right: 0;
+  bottom: 0;
+  border: 1.5px solid black;
+  border-radius: 8px;
+  padding: 8px;
+}
+
 .hover-link {
   transition-duration: 100ms;
   opacity: 0.5;
+  cursor:pointer;
 }
 
 .hover-link:hover {
