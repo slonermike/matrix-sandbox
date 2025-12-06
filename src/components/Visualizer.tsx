@@ -1,7 +1,7 @@
 import {vec2, mat2d} from 'gl-matrix'
-import { useContext, useLayoutEffect, useMemo, useState } from 'react'
+import { useLayoutEffect, useMemo, useState } from 'react'
 import { transformToMatrix } from '../transform'
-import { SandboxContext } from './SandboxContext'
+import { useSandboxStore } from '../store/sandboxStore'
 
 interface VisualizerProps {
   shape: vec2[]
@@ -17,7 +17,7 @@ export function Visualizer({shape}: VisualizerProps) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
 
-  const {transforms, hoveredId} = useContext(SandboxContext)
+  const {transforms, hoveredId} = useSandboxStore()
 
   useLayoutEffect(() => {
     const handleResize = () => {
