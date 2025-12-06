@@ -2,10 +2,7 @@ import {vec2, mat2d} from 'gl-matrix'
 import { useLayoutEffect, useMemo, useState } from 'react'
 import { transformToMatrix } from '../transform'
 import { useSandboxStore } from '../store/sandboxStore'
-
-interface VisualizerProps {
-  shape: vec2[]
-}
+import { shapes } from '../shapes'
 
 interface TransformStep {
   matrix: mat2d,
@@ -13,11 +10,12 @@ interface TransformStep {
   id: number
 }
 
-export function Visualizer({shape}: VisualizerProps) {
+export function Visualizer() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
 
-  const {transforms, hoveredId} = useSandboxStore()
+  const {transforms, hoveredId, shapeName} = useSandboxStore()
+  const shape = shapes[shapeName]
 
   useLayoutEffect(() => {
     const handleResize = () => {

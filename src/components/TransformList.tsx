@@ -1,8 +1,10 @@
 import { Reorder, useDragControls } from 'framer-motion'
 import { useSandboxStore } from '../store/sandboxStore';
 import { TransformItem } from './TransformItem';
+import { ShapeSelector } from './ShapeSelector';
 import { type Transform } from '../transform';
 import { type CSSProperties } from 'react';
+import './TransformCard.css';
 
 const dragHandleStyle: CSSProperties = {
   cursor: 'grab',
@@ -18,25 +20,28 @@ function ReorderableTransformItem({ t }: { t: Transform }) {
   const setHoveredId = useSandboxStore(state => state.setHoveredId)
 
   return (
-    <Reorder.Item
-      as="div"
-      key={t.id}
-      value={t}
-      dragListener={false}
-      dragControls={dragControls}
-      onDrag={() => setHoveredId(null)}
-      onDragStart={() => {}}
-      onDragEnd={() => {}}
-      style={{ position: 'relative' }}
-    >
-      <span
-        style={dragHandleStyle}
-        onPointerDown={(e) => dragControls.start(e)}
+    <>
+      <Reorder.Item
+        as="div"
+        key={t.id}
+        value={t}
+        dragListener={false}
+        dragControls={dragControls}
+        onDrag={() => setHoveredId(null)}
+        onDragStart={() => {}}
+        onDragEnd={() => {}}
+        style={{ position: 'relative' }}
       >
-        ⋮⋮
-      </span>
-      <TransformItem t={t} />
-    </Reorder.Item>
+        <span
+          style={dragHandleStyle}
+          onPointerDown={(e) => dragControls.start(e)}
+        >
+          ⋮⋮
+        </span>
+        <TransformItem t={t} />
+      </Reorder.Item>
+      <div className="multiplication-symbol">×</div>
+    </>
   )
 }
 
@@ -54,6 +59,7 @@ export function TransformList() {
     {transforms.map((t) => (
       <ReorderableTransformItem key={t.id} t={t} />
     ))}
+    <ShapeSelector />
   </Reorder.Group>
 }
 

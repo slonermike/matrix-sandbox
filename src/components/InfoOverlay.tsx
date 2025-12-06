@@ -58,25 +58,7 @@ function InfoPanel() {
       <div className={'info-verbose'} style={{ position: 'relative' }}>
         <button
           onClick={() => setInfoOpen(false)}
-          style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            background: 'black',
-            color: 'white',
-            border: 'none',
-            borderRadius: '50%',
-            width: '24px',
-            height: '24px',
-            fontSize: '18px',
-            cursor: 'pointer',
-            padding: '0',
-            lineHeight: '1',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10
-          }}
+          className="info-close-button"
         >
           ×
         </button>

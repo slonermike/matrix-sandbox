@@ -1,32 +1,11 @@
-import { type ChangeEvent, type CSSProperties, type KeyboardEvent, useCallback, useMemo, useState } from "react"
+import { type ChangeEvent, type KeyboardEvent, useCallback, useState } from "react"
 import { type Transform } from "../transform"
 import { transformValueStrings } from "../util/inputUtils"
 import { useSandboxStore } from "../store/sandboxStore"
 import { type vec2 } from "gl-matrix"
 import { Vec2Input } from "./Vec2Input"
 import { RotationInput } from "./RotationInput"
-
-const titleStyle: CSSProperties = {
-  fontWeight: 'bold',
-  textTransform: 'capitalize',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  gap: '8px',
-  width: '100%'
-}
-
-const transformStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
-  border: '2px black solid',
-  borderRadius: '6px',
-  margin: '8px',
-  padding: '8px',
-  backgroundColor: `rgb(0, 128, 128)`,
-  gap: '8px'
-}
+import "./TransformCard.css"
 
 interface ItemProps {
   t: Transform
@@ -53,10 +32,6 @@ export function TransformItem({t}: ItemProps) {
       return newStrings
     })
   }, [setInputValues])
-
-  const styles = useMemo(() => {
-    return transformStyle
-  }, [])
 
   const moveValue = useCallback((t: Transform, key: string, mod: boolean, index: number) => {
     const change: vec2 = [0, 0]
@@ -175,11 +150,11 @@ export function TransformItem({t}: ItemProps) {
     updateStrings(newTransform)
   }, [t, replaceTransform, updateStrings])
 
-  return <div style={styles}
+  return <div className="transform-card"
     onMouseOver={onMouseOver}
     onMouseOut={onMouseOut}
     >
-    <div style={titleStyle}>{t.type}<input type={'checkbox'} checked={t.active} onChange={onCheckActive}/></div>
+    <div className="transform-card-title">{t.type}<input type={'checkbox'} checked={t.active} onChange={onCheckActive}/></div>
     {t.type === 'move' && (
       <Vec2Input value={t.move} scale={200} onChange={onVec2Change} />
     )}
